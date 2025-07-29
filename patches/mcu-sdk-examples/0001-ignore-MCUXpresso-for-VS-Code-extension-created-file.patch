@@ -1,0 +1,28 @@
+From 2a431bab3076c6736b27430410ebe77e335a70c6 Mon Sep 17 00:00:00 2001
+From: Benedek Kupper <kupper.benedek@gmail.com>
+Date: Fri, 18 Jul 2025 22:40:53 +0200
+Subject: [PATCH] ignore MCUXpresso for VS Code extension created files
+
+---
+ .gitignore | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index f414f64da..f82c1b6a4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -19,4 +19,9 @@ aac.adts.h
+ !*/wireless_examples/linker/iar
+ !*/wireless_examples/linker/mcux
+ !*/wireless_examples/linker/mdk
+-build/
+\ No newline at end of file
++build/
++debug/
++release/
++.vscode/
++CMakePresets.json
++mcux_include.json
+-- 
+2.43.0
+

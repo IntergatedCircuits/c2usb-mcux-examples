@@ -1,0 +1,105 @@
+From 509f949a9b4bc12b0bba26043c19d8a69d97ad32 Mon Sep 17 00:00:00 2001
+From: Benedek Kupper <kupper.benedek@gmail.com>
+Date: Tue, 29 Jul 2025 16:07:51 +0200
+Subject: [PATCH]  use SDK delay for wakeup
+
+---
+ device/usb_device_ehci.c | 23 +++++++----------------
+ device/usb_device_khci.c | 11 +----------
+ 2 files changed, 8 insertions(+), 26 deletions(-)
+
+diff --git a/device/usb_device_ehci.c b/device/usb_device_ehci.c
+index 1780f87..8b845c9 100644
+--- a/device/usb_device_ehci.c
++++ b/device/usb_device_ehci.c
+@@ -1082,10 +1082,10 @@ static usb_status_t USB_DeviceEhciTransfer(usb_device_ehci_state_struct_t *ehciS
+     uint8_t qhIdle              = 0U;
+     uint8_t waitingSafelyAccess = 1U;
+     uint32_t primeTimesCount    = 0U;
+-/* CONFIG_UDC_DRIVER is for Zephyr, it will not be defined in NXP MCUXpresso SDK */
+-#if !((defined CONFIG_UDC_DRIVER) && (CONFIG_UDC_DRIVER))
++/* CONFIG_UDC_DRIVER is for Zephyr, it will not be defined in NXP MCUXpresso SDK */
++#if !((defined CONFIG_UDC_DRIVER) && (CONFIG_UDC_DRIVER))
+     void *temp;
+-#endif
++#endif
+     OSA_SR_ALLOC();
+ 
+     if (NULL == ehciState)
+@@ -1205,8 +1205,8 @@ static usb_status_t USB_DeviceEhciTransfer(usb_device_ehci_state_struct_t *ehciS
+             qhIdle                    = 1U;
+         }
+     } while (0U != length);
+-/* CONFIG_UDC_DRIVER is for Zephyr, it will not be defined in NXP MCUXpresso SDK */
+-#if !((defined CONFIG_UDC_DRIVER) && (CONFIG_UDC_DRIVER))
++/* CONFIG_UDC_DRIVER is for Zephyr, it will not be defined in NXP MCUXpresso SDK */
++#if !((defined CONFIG_UDC_DRIVER) && (CONFIG_UDC_DRIVER))
+     if ((USB_CONTROL_ENDPOINT == (endpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
+         (USB_IN == ((endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) >>
+                     USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_SHIFT)))
+@@ -1227,7 +1227,7 @@ static usb_status_t USB_DeviceEhciTransfer(usb_device_ehci_state_struct_t *ehciS
+             }
+         }
+     }
+-#endif
++#endif
+     /* If the QH is not empty */
+     if (0U == qhIdle)
+     {
+@@ -1944,11 +1944,6 @@ usb_status_t USB_DeviceEhciControl(usb_device_controller_handle ehciHandle, usb_
+ 
+ #if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))
+     usb_device_struct_t *deviceHandle;
+-#endif
+-#if (defined(USB_DEVICE_CONFIG_LOW_POWER_MODE) && (USB_DEVICE_CONFIG_LOW_POWER_MODE > 0U))
+-#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))
+-    uint64_t startTick;
+-#endif
+ #endif
+ 
+     if (NULL == ehciHandle)
+@@ -2073,11 +2068,7 @@ usb_status_t USB_DeviceEhciControl(usb_device_controller_handle ehciHandle, usb_
+ #endif
+             ehciState->registerBase->PORTSC1 &= ~USBHS_PORTSC1_PHCD_MASK;
+             ehciState->registerBase->PORTSC1 |= USBHS_PORTSC1_FPR_MASK;
+-            startTick = deviceHandle->hwTick;
+-            while ((deviceHandle->hwTick - startTick) < 10U)
+-            {
+-                __NOP();
+-            }
++            SDK_DelayAtLeastUs(3000U, SystemCoreClock);
+             ehciState->registerBase->PORTSC1 &= ~USBHS_PORTSC1_FPR_MASK;
+             error = kStatus_USB_Success;
+             break;
+diff --git a/device/usb_device_khci.c b/device/usb_device_khci.c
+index c62addc..0ee7f7e 100644
+--- a/device/usb_device_khci.c
++++ b/device/usb_device_khci.c
+@@ -1507,11 +1507,6 @@ usb_status_t USB_DeviceKhciControl(usb_device_controller_handle khciHandle, usb_
+ #endif
+ #if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))
+     usb_device_struct_t *deviceHandle;
+-#endif
+-#if ((defined(USB_DEVICE_CONFIG_LOW_POWER_MODE)) && (USB_DEVICE_CONFIG_LOW_POWER_MODE > 0U))
+-#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))
+-    uint64_t startTick;
+-#endif
+ #endif
+     usb_status_t status = kStatus_USB_Error;
+ 
+@@ -1627,11 +1622,7 @@ usb_status_t USB_DeviceKhciControl(usb_device_controller_handle khciHandle, usb_
+ #if defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U)
+         case kUSB_DeviceControlResume:
+             khciState->registerBase->CTL |= USB_CTL_RESUME_MASK;
+-            startTick = deviceHandle->hwTick;
+-            while ((deviceHandle->hwTick - startTick) < 10U)
+-            {
+-                __NOP();
+-            }
++            SDK_DelayAtLeastUs(3000U, SystemCoreClock);
+             khciState->registerBase->CTL &= (uint8_t)(~USB_CTL_RESUME_MASK);
+             status = kStatus_USB_Success;
+             break;
+-- 
+2.43.0
+

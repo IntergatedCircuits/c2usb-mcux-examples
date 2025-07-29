@@ -1,0 +1,33 @@
+manifest:
+  remotes:
+    - name: nxp-mcuxpresso
+      url-base: https://github.com/nxp-mcuxpresso
+    - name: IntergatedCircuits
+      url-base: https://github.com/IntergatedCircuits
+  group-filter:
+    - +optional # mcux-soc-svd
+  self:
+    path: c2usb-mcux-examples
+    west-commands: scripts/west_commands.yml
+
+  projects:
+    - name: mcuxsdk-manifests
+      remote: nxp-mcuxpresso
+      path: mcuxsdk/manifest_int
+      revision: v25.06.00
+      clone-depth: 1
+      import:
+        name-allowlist:
+          - core
+          - CMSIS
+          - mcu-sdk-components
+          - mcu-sdk-examples
+          - mcuxsdk-tool-data
+          - mcux-soc-svd
+          - mcux-devices-kinetis
+          - usb
+
+    - name: c2usb
+      remote: IntergatedCircuits
+      revision: e9dda4e07d7b06dbc3099589fca1e31a22558c94
+      submodules: true

@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "Manifest repository"
+		},
+		{
+			"path": "../c2usb",
+			"name": "c2usb"
+		},
+		{
+			"path": "../mcuxsdk",
+			"name": "MCUX SDK"
+		},
+		{
+			"path": "hid-keyboard"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.h": "c",
+			"*.c": "c",
+			"*.hpp": "cpp",
+			"*.cpp": "cpp"
+		},
+		"cmake.useCMakePresets": "always",
+		"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+		"C_Cpp.workspaceParsingPriority": "high",
+		"C_Cpp.autoAddFileAssociations": false
+	},
+	"extensions": {
+		"recommendations": [
+			"NXPSemiconductors.mcuxpresso",
+			"ms-vscode.cpptools-extension-pack",
+			"ms-vscode.vscode-embedded-tools",
+			"mcu-debug.peripheral-viewer",
+			"marus25.cortex-debug"
+		]
+	}
+}
