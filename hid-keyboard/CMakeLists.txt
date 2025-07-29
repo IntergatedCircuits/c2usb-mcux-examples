@@ -23,10 +23,6 @@ mcux_add_source(
         main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    c2usb-example-hid
-)
-
 mcux_convert_binary(
     BINARY "${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin"
 )
