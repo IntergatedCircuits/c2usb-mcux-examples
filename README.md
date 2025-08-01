@@ -11,7 +11,7 @@ command:
 ```shell
 # initialize my-workspace for the usb-keyboard (main branch)
 west init -m https://github.com/IntergatedCircuits/c2usb-mcux-examples c2usb-workspace
-cd c2usb-workspace
+cd c2usb-mcux-workspace
 # update mcuxsdk modules
 west update
 west patch
@@ -25,8 +25,13 @@ In the latter case open the `projects.code-workspace` file in vscode.
 ### hid-keyboard
 
 A straightforward USB HID keyboard. Use the button on the board to trigger a caps lock press,
-and observe as the host changes the caps lock state on the board's LED. When suspended,
+and observe as the host changes the caps lock state on the board's red LED. When suspended,
 the button press triggers a remote wakeup request.
+
+### hid-mouse
+
+A USB HID mouse, with high-resolution scrolling support. The red LED lights up if the host enables this feature.
+The board's SW2 button scrolls down.
 
 ## Building and running
 

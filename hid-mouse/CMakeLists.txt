@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(EXTRA_MCUX_MODULES ${CMAKE_CURRENT_LIST_DIR}/../../c2usb)
 include("${SdkRootDirPath}/cmake/extension/mcux.cmake")
 project(
-    hid-keyboard
+    hid-mouse
     LANGUAGES ASM C CXX
 )
 include("${SdkRootDirPath}/CMakeLists.txt")

@@ -1,0 +1,39 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "West update",
+			"group": {
+				"kind": "none",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"type": "process",
+			"command": "west",
+			"args": [
+				"update"
+			]
+		},
+		{
+			"label": "West patch",
+			"group": {
+				"kind": "none",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"type": "process",
+			"command": "west",
+			"args": [
+				"patch"
+			],
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"West update"
+			]
+		}
+	]
+}

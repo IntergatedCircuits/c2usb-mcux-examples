@@ -8,8 +8,8 @@ extern "C"
 #include "fsl_port.h"
 #endif
 }
+#include "high_resolution_mouse.hpp"
 #include "port/nxp/mcux_mac.hpp"
-#include "simple_keyboard.hpp"
 #include "usb/df/class/hid.hpp"
 #include "usb/df/device.hpp"
 
@@ -54,20 +54,19 @@ extern "C" void USB_DeviceClockInit(void)
 #endif /* FSL_FEATURE_USB_KHCI_IRC48M_MODULE_CLOCK_ENABLED */
 }
 
-auto& keyboard_app()
+auto& mouse_app()
 {
-    static simple_keyboard<> kb(
-        [](const simple_keyboard<>::kb_leds_report& report)
-        {
-            GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN,
-                          !report.leds.test(hid::page::leds::CAPS_LOCK));
-        });
-    return kb;
+    static high_resolution_mouse<> m(
+        [](const high_resolution_mouse<>::resolution_multiplier_report& report)
+        { GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, report.resolutions == 0); });
+    return m;
 }
+
+static high_resolution_mouse<>::mouse_report mouse_report{};
 
 auto& device()
 {
-    static constexpr usb::product_info prinfo{0x1FC9, "NXP", 0x0091, "c2usb hid-keyboard",
+    static constexpr usb::product_info prinfo{0x1FC9, "NXP", 0x0091, "c2usb hid-mouse",
                                               usb::version("1.0")};
     static usb::df::device_instance<usb::speed::FULL> device{mac(), prinfo};
     return device;
@@ -84,6 +83,15 @@ extern "C" void BOARD_SW2_IRQ_HANDLER(void)
     GPIO_PortClearInterruptFlags(BOARD_SW2_GPIO, 1U << BOARD_SW2_GPIO_PIN);
 #endif
     bool pressed = GPIO_PinRead(BOARD_SW2_GPIO, BOARD_SW2_GPIO_PIN) == 0;
+    if (pressed)
+    {
+        SysTick_Config(MSEC_TO_COUNT((mouse_app().multiplier_report().high_resolution() ? 10 : 100),
+                                     SystemCoreClock));
+    }
+    else
+    {
+        SysTick->CTRL &= ~_VAL2FLD(SysTick_CTRL_ENABLE, 1);
+    }
     switch (device().power_state())
     {
     case usb::power::state::L2_SUSPEND:
@@ -93,11 +101,22 @@ extern "C" void BOARD_SW2_IRQ_HANDLER(void)
         }
         break;
     case usb::power::state::L0_ON:
-        keyboard_app().send_key(hid::page::keyboard_keypad::KEYBOARD_CAPS_LOCK, pressed);
+        mouse_report.wheel_y = pressed ? -1 : 0;
+        mouse_app().send(mouse_report);
         break;
     default:
         break;
     }
+    SDK_ISR_EXIT_BARRIER;
+}
+
+extern "C" void SysTick_Handler(void)
+{
+    if (device().power_state() != usb::power::state::L0_ON)
+    {
+        return;
+    }
+    mouse_app().send(mouse_report);
     SDK_ISR_EXIT_BARRIER;
 }
 
@@ -106,10 +125,10 @@ int main(void)
     BOARD_InitHardware();
     USB_DeviceClockInit();
 
-    static usb::df::hid::function usb_kb{keyboard_app(), usb::hid::boot_protocol_mode::KEYBOARD};
+    static usb::df::hid::function usb_mouse{mouse_app()};
     static const auto single_config = usb::df::config::make_config(
-        usb::df::config::header(usb::df::config::power::bus(100, true), "hid-keyboard"),
-        usb::df::hid::config(usb_kb, usb::speed::FULL, usb::endpoint::address(0x81), 1));
+        usb::df::config::header(usb::df::config::power::bus(100, true), "hid mouse"),
+        usb::df::hid::config(usb_mouse, usb::speed::FULL, usb::endpoint::address(0x81), 1));
     device().set_config(single_config);
     device().open();
     device().set_power_event_delegate(
