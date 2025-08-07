@@ -12,9 +12,9 @@ command:
 # initialize my-workspace for the usb-keyboard (main branch)
 west init -m https://github.com/IntergatedCircuits/c2usb-mcux-examples c2usb-workspace
 cd c2usb-mcux-workspace
+pip3 install -r scripts/requirements.txt
 # update mcuxsdk modules
-west update
-west patch
+west update && west patch
 ```
 
 You can continue developing with the command line, or with the MCUXpresso for VS Code extension.

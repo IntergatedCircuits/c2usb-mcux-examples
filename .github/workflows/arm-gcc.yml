@@ -35,32 +35,24 @@ jobs:
         run: pip3 install --user -U west
 
       - name: Install python dependencies of scripts
-        run: |
-          pip install -r scripts/requirements.txt
+        run: pip3 install -r scripts/requirements.txt
 
       - name: Git config
-        shell: bash
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: West init
-        shell: bash
-        run: |
-          west init -l .
+        run: west init -l .
 
       - name: Fetch SDK
-        shell: bash
-        run: |
-          west update && west patch
+        run: west update && west patch
 
       - name: Install build dependencies
-        run: |
-          sudo apt-get install -y gcc-arm-none-eabi
+        run: sudo apt-get install -y gcc-arm-none-eabi
 
       - name: Build firmware
         working-directory: ${{ matrix.app }}
-        shell: bash
         run: |
           BOARD=${{ matrix.board }} west build -d ${{ matrix.preset }} -- --preset ${{ matrix.preset }}
 
@@ -68,5 +60,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.app }}
-          path: |
-            ${{ matrix.app }}/${{ matrix.preset }}/${{ matrix.app }}.elf
+          path: ${{ matrix.app }}/${{ matrix.preset }}/${{ matrix.app }}.elf
