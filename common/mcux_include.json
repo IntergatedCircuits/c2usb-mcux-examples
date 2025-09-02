@@ -14,7 +14,8 @@
         "BOARD": "frdmk22f",
         "MCUX_VENV_PATH": "",
         "PATH": "$env{MCUX_VENV_PATH}${pathListSep}$penv{PATH}",
-        "POSTPROCESS_UTILITY": ""
+        "POSTPROCESS_UTILITY": "",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "cacheVariables": {}
     },
@@ -28,7 +29,8 @@
         "BOARD": "frdmk22f",
         "MCUX_VENV_PATH": "",
         "PATH": "$env{MCUX_VENV_PATH}${pathListSep}$penv{PATH}",
-        "POSTPROCESS_UTILITY": ""
+        "POSTPROCESS_UTILITY": "",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "cacheVariables": {}
     }
